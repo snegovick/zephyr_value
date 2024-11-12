@@ -1,0 +1,105 @@
+description: |
+  Unified value parameters.
+
+  Parameter values can be get and set both via API or using shell
+  commands depending from concrete usecase.
+
+  Config example:
+
+      params {
+          compatible = "value-params";
+          #value-cells = <1>;
+
+          temp {
+              id = <1>;
+              units = "C";
+              fract-digits = <2>;
+              scale = <(1 << 4)>;
+              value = <245 10>; // 24.5 C
+              min = <100 10>; // 10 C
+              max = <800 10>; // 80 C
+          };
+          /* ...other parameters */
+      };
+
+compatible: value-params
+
+include:
+  - base.yaml
+  - value-api.yaml
+
+child-binding:
+  description: |
+    Parameter descriptions.
+
+  properties:
+    id:
+      type: int
+      required: true
+      description: |
+        Integer identifier of value associated with parameter.
+
+    units:
+      type: string
+      description: |
+        The units for value of parameter.
+
+    scale:
+      type: int
+      default: 1
+      description: |
+        The scale (divider) for value.
+
+        By default scale is equals to 1.
+
+    value:
+      type: array
+      default: [0]
+      description: |
+        The default value for parameter.
+
+        Set either as <number> or <numerator denominator>.
+
+        If not set the 0 will be used by default.
+
+    min:
+      type: array
+      description: |
+        The optional minimum value.
+
+        Set either as <number> or <numerator denominator>.
+
+        When set via API the value will be clamped to specified range.
+
+    max:
+      type: array
+      description: |
+        The optional maximum value.
+
+        Set either as <number> or <numerator denominator>.
+
+        When set via API the value will be clamped to specified range.
+
+    int-digits:
+      type: int
+      default: 0
+      description: |
+        The minimum number of decimal digits for integer part of value.
+
+        This property can be used for alignment.
+
+    fract-digits:
+      type: int
+      default: 0
+      description: |
+        The number of decimal digits after point for values.
+
+        If this property is not provided then only integer part of value
+        will be displayed.
+
+    non-volatile:
+      type: boolean
+      description: |
+        Non-volatile parameters can be saved and loaded to/from settings.
+
+        All parameters stored with single settings item.

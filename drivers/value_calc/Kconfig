@@ -1,0 +1,34 @@
+# Configuration file for value calculator driver
+
+menuconfig VALUE_CALC
+	bool "Value calc driver"
+	default y
+	depends on DT_HAS_VALUE_CALC_ENABLED
+	help
+	  Enable calculated values support.
+
+if VALUE_CALC
+
+module = VALUE_CALC
+module-str = calc
+source "subsys/logging/Kconfig.template.log_config"
+
+config VALUE_CALC_INIT_PRIORITY
+	int "Driver initialization priority"
+	default 95
+	help
+	  System initialization priority for calculated value drivers.
+
+config VALUE_CALC_MAX_RESULTS
+	int "Maximum number of result values"
+	default 32
+	help
+	  How many result values can be used per device.
+
+config VALUE_CALC_SHELL
+	bool "Shell command support"
+	select FIXED_POINT
+	help
+	  Enables shell commands to enable/disable calculations and show results.
+
+endif # VALUE_CALC

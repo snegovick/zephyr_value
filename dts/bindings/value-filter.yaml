@@ -1,0 +1,115 @@
+description: |
+  Unified value filter driver bindings.
+
+compatible: value-filter
+
+include:
+  - base.yaml
+  - value-api.yaml
+
+properties:
+  values:
+    type: phandle-array
+    required: true
+    description: |
+      Input value phandle
+
+  period:
+    type: array
+    required: true
+    description: |
+      Time span to discretize parameters (P, seconds)
+
+  alpha:
+    type: array
+    description: |
+      Configure EMA filter using parameter α (weight).
+      Smaller α gives smoother result.
+      For correct operation α should be less than or equal to 1.
+
+          0 < α <= 1
+
+          y = α * x + (1 - α) * y0
+
+      Either alpha, samples or window should be configured.
+
+  samples:
+    type: array
+    description: |
+      Configure EMA filter using number of samples (n) <numerator denominator>.
+      Greater number of samples gives smoother result.
+      Samples should be one or more. It also may be fractional.
+
+          α = 2 / (n + 1)
+
+          n > 1 => α < 1
+
+          y = α * x + (1 - α) * y0
+
+      Either alpha, samples or window should be configured.
+
+  window:
+    type: array
+    description: |
+      Configure EMA filter using time window (T, seconds).
+      Longer period gives smoother result.
+      For correct operation time window (T) should be greater than period (P).
+
+          α = 2 / (T / P + 1)
+
+          T > P => α < 1
+
+          y = α * x + (1 - α) * y0
+
+      Either alpha, samples or window should be configured.
+
+  input-scale:
+    type: int
+    default: 1
+    description: |
+      Source value scale.
+
+      The power-of-two values is preferred for fast calculations.
+
+  param-scale:
+    type: int
+    default: 1
+    description: |
+      Filter parameter value scale.
+
+      The power-of-two values is preferred for fast calculations.
+
+  output-scale:
+    type: int
+    default: 1
+    description: |
+      Result value scale.
+
+      The power-of-two values is preferred for fast calculations.
+
+  output-fract-digits:
+    type: int
+    default: 3
+    description: |
+      Number of fraction digits for output values.
+
+      Used by shell commands.
+
+  param-fract-digits:
+    type: int
+    default: 3
+    description: |
+      Number of fraction digits for parameter values.
+
+      Used by shell commands.
+
+  units:
+    type: string
+    description: |
+      Human-readable measurement units of input and output value.
+
+      Used by shell commands.
+
+  initial-active:
+    type: boolean
+    description: Enable filter by defualt

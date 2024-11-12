@@ -1,0 +1,109 @@
+description: |
+  ADC values poller.
+
+  Example:
+
+      adc_val0: adc_val {
+          compatible = "adc-values";
+          #address-cells = <1>;
+          #size-cells = <0>;
+
+          adc_val_ch0: channel@0 {
+              reg = <0x0>;
+              io-channels = <&adc1 2>;
+              scale = <(1 << 12)>;
+              gain = <1 1>;
+              offset = <0 1>;
+          };
+
+          adc_val_ch1: channel@1 {
+              reg = <0x1>;
+              io-channels = <&adc_mux1 3>;
+              /* ... */
+          };
+
+          /* ... */
+
+          adc_val_ch10: channel@a {
+              reg = <0xa>;
+              io-channels = <&adc2 0>;
+              /* ... */
+          };
+      };
+
+compatible: adc-values
+
+include:
+  - base.yaml
+  - value-api.yaml
+
+properties:
+  "#address-cells":
+    required: false
+    const: 1
+
+  "#size-cells":
+    required: false
+    const: 0
+
+  initial-active:
+    type: boolean
+    description: Enable polling on initialization.
+
+child-binding:
+  description: |
+    ADC channels to poll.
+
+  properties:
+    reg:
+      type: array
+      required: true
+      description: Channel identifier.
+
+    io-channels:
+      type: phandle-array
+      description: |
+        ADC channel to poll.
+
+        value = raw * gain * scale + bias * scale
+
+        If both vref and sat props is set:
+
+        value = raw * gain * scale * vref / sat + bias * scale
+
+    vref:
+      type: array
+      description: |
+        ADC reference voltage for channel.
+
+        For ex.: 3.3V (3300 1000)
+
+    sat:
+      type: int
+      description: |
+        Saturated ADC value
+
+        Usually it's a maximum value which reached at Vref.
+
+        sat = 2 ^ ADC_res
+
+        So for 12-bit ADC resolution:
+
+        sat = 2 ^ 12 = 4096
+
+    gain:
+      type: array
+      default: [1, 1]
+      description: |
+        Raw ADC value gain (<numerator denominator>).
+
+    bias:
+      type: array
+      default: [0, 1]
+      description: |
+        Output value offset (<numerator denominator>).
+
+    scale:
+      type: int
+      description: |
+        Output value scale.

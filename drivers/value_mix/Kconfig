@@ -1,0 +1,37 @@
+# Configuration file for value mixer driver
+
+menuconfig VALUE_MIX
+	bool "Value mixer driver"
+	default y
+	depends on DT_HAS_VALUE_MIX_ENABLED
+	help
+	  Enable value mixer support.
+
+if VALUE_MIX
+
+module = VALUE_MIX
+module-str = mix
+source "subsys/logging/Kconfig.template.log_config"
+
+config VALUE_MIX_INIT_PRIORITY
+	int "Driver initialization priority"
+	default 95
+	help
+	  System initialization priority for value mixer drivers.
+
+config VALUE_MIX_SETTINGS
+	bool "Use settings to store mixer weights"
+	default y
+	depends on SETTINGS
+	select SETTINGS_INIT
+	help
+	  Enable storing mixer weights in settings
+
+config VALUE_MIX_SHELL
+	bool "Value mixer shell command"
+	depends on SHELL
+	select FIXED_POINT
+	help
+	  Enable value mixer shell commands
+
+endif # VALUE_MIX

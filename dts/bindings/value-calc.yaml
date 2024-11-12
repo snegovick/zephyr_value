@@ -1,0 +1,183 @@
+description: |
+  Unified calculated value provider.
+
+  Provided values can be calculated using another values.
+
+  Config example:
+      #include <dt-bindings/value/sync.h>
+      #include <dt-bindings/value/calc.h>
+
+      calcs: calcs {
+          compatible = "value-calc";
+          #value-cells = <1>;
+
+          values = <&adc_vals V_IN_CH>,
+                   <&adc_vals I_IN_CH>,
+                   <&adc_vals V_OUT_CH>;
+          value-names = "V_in", "I_in", "V_out";
+          value-scales = <(1 << 24)>, <(1 << 16)>;
+
+          P_in {
+              op = "mul";
+              arg1-name = "V_in";
+              arg2-name = "I_in";
+              // export as a value with id: 0
+              res-id = <0>;
+              res-name = "P_in";
+              res-scale = <(1 << 16)>;
+          };
+
+          P_out {
+              op = "mul";
+              arg1-name = "P_in";
+              arg2 = <85 100>; /* CoP: 85% */
+              arg2-scale = <(1 << 28)>;
+              // do not export as a value
+              res-name = "P_out";
+              res-scale = <(1 << 16)>;
+          };
+
+          I_out {
+              op = "div";
+              arg1-name = "P_out";
+              arg2-name = "V_out";
+              // export as a value with id: 1
+              res-id = <1>;
+          };
+          /* ...other calcs */
+      };
+
+      sync: sync {
+          compatible = "value-sync";
+          values = <&adc_vals ADC_VALUES_SYNC>,
+                   <&calcs CALC_SYNC>;
+      };
+
+compatible: value-calc
+
+include:
+  - base.yaml
+  - value-api.yaml
+
+properties:
+  values:
+    type: phandle-array
+    required: true
+    description: |
+      Values phandles which can be used as arguments for operations.
+
+  value-names:
+    type: string-array
+    required: true
+    description: |
+      The names for values.
+
+      Set this property to be able to use valuea as arguments in operations.
+
+  value-scales:
+    type: array
+    required: true
+    description: |
+      The scales for values.
+
+  initial-active:
+    type: boolean
+    description: |
+      Enable driver by default
+
+child-binding:
+  description: |
+    Calculation operations.
+
+  properties:
+    op:
+      type: string
+      enum:
+        - scl
+        - neg
+        - inv
+        - add
+        - sub
+        - mul
+        - div
+        - min
+        - max
+      description: |
+        Operation name:
+
+          - scl - Rescale (arg1)
+          - neg - Negate (- arg1)
+          - inv - Invert (1 / arg1)
+          - add - Add (arg1 + arg2)
+          - sub - Subtract (arg1 - arg2)
+          - mul - Multiply (arg1 * arg2)
+          - div - Divide (arg1 / arg2)
+
+    arg1-name:
+      type: string
+      description: |
+        The name of first argument.
+
+        Either `arg1-name` or `arg1-const` must be provided.
+
+    arg1:
+      type: array
+      description: |
+        The value of first argument.
+
+        <value> or <numerator donominator>.
+
+        Either `arg1-name` or `arg1-const` must be provided.
+
+    arg1-scale:
+      type: int
+      default: 1
+      description: |
+        The scale of first argument. Required for constant only.
+
+    arg2-name:
+      type: string
+      description: |
+        The name of second argument.
+
+    arg2:
+      type: array
+      description: |
+        The value of second argument.
+
+        <value> or <numerator donominator>.
+
+        Either `arg1-name` or `arg1-const` should be provided.
+
+    arg2-scale:
+      type: int
+      default: 1
+      description: |
+        The scale of second argument. Required for constant only.
+
+    res-name:
+      type: string
+      description: |
+        The name of result of current operation.
+
+        If it hasn't assigned then result cannot be used by the subsequent operations.
+
+        Either `res-name` or `res-id` should be provided.
+
+    res-id:
+      type: int
+      description: |
+        Integer identifier of result value.
+
+        If it hasn't assigned then result won't be available for consumers.
+        Typically intermediate operations does not need that.
+
+        Either `res-name` or `res-id` should be provided.
+
+    res-scale:
+      type: int
+      default: 1
+      description: |
+        The scale (divider) for result value.
+
+        By default scale is equals to 1.

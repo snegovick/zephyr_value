@@ -1,0 +1,140 @@
+description: |
+  Unified value mixer.
+
+  Set output value via interpolating input values with runtime configuration.
+
+  Config example:
+      #include <dt-bindings/value/sync.h>
+      #include <dt-bindings/value/mix.h>
+
+      tmix: tmix {
+          compatible = "value-mix";
+          #value-cells = <1>;
+
+          values = <&tsen0 TEMP>,
+                   <&tsen0 INT_TEMP>,
+                   <&tsen1 TEMP>;
+          value-names = "t0", "ti0", "t1";
+
+          input-scale = <(1 << 16)>;
+          output-scale = <(1 << 16)>;
+          weight-scale = <(1 << 24)>;
+
+          // 60% 25% 15%
+          weights = <60>, <25>, <15>;
+          weight-divider = <100>;
+      };
+
+      sync: sync {
+          compatible = "value-sync";
+          values = <&tsen0 TSEN_SYNC>,
+                   <&tsen1 TSEN_SYNC>,
+                   <&tmix MIX_SYNC>;
+      };
+
+compatible: value-mix
+
+include:
+  - base.yaml
+  - value-api.yaml
+
+properties:
+  values:
+    type: phandle-array
+    required: true
+    description: |
+      Values phandles which can be used as inputs.
+
+  value-names:
+    type: string-array
+    required: true
+    description: |
+      The names of input value phandles.
+
+  weights:
+    type: array
+    required: true
+    description: |
+      Default weight values.
+
+      Each weight corresponds to an input value.
+
+  weight-divider:
+    type: int
+    default: 1
+    description: |
+      The denominator value for default weights.
+
+      Set to 100 when your default weights measured in percentages.
+
+  input-scale:
+    type: int
+    default: 1
+    description: |
+      The default scale for input values.
+
+      Use either `input-scale` or `input-scales`.
+
+  input-scales:
+    type: array
+    description: |
+      The scales for input values.
+
+      Use either `input-scale` or `input-scales`.
+
+  input-fraction:
+    type: int
+    default: 3
+    description: |
+      The number of fraction digits for input values.
+
+      Default value is 3.
+
+  input-units:
+    type: string
+    default: ""
+    description: |
+      The name of units for input value.
+
+      Units will be used in shell commands only.
+
+  output-scale:
+    type: int
+    default: 1
+    description: |
+      The scale for output value
+
+  output-fraction:
+    type: int
+    default: 3
+    description: |
+      The number of fraction digits for output values.
+
+      Default value is 3.
+
+  output-units:
+    type: string
+    default: ""
+    description: |
+      The name of units for output value.
+
+      Units will be used in shell commands only.
+
+  weight-scale:
+    type: int
+    default: 1
+    description: |
+      The scale for weight values
+
+  weight-fraction:
+    type: int
+    default: 3
+    description: |
+      The number of fraction digits for weight values.
+
+      Default value is 3.
+
+  initial-active:
+    type: boolean
+    description: |
+      Enable driver by default

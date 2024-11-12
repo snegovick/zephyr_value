@@ -1,0 +1,28 @@
+# Configuration file for value min/max driver
+
+menuconfig MINMAX
+	bool "Value min/max driver"
+	default y
+	depends on DT_HAS_VALUE_MINMAX_ENABLED
+	help
+	  Enable value min/max support.
+
+if MINMAX
+
+module = MINMAX
+module-str = minmax
+source "subsys/logging/Kconfig.template.log_config"
+
+config MINMAX_INIT_PRIORITY
+	int "Driver initialization priority"
+	default 95
+	help
+	  System initialization priority for value min/max drivers.
+
+config MINMAX_MAX_VALUES
+	int "Maximum number of values"
+	default 32
+	help
+	  How many values can be configured per device.
+
+endif # MINMAX

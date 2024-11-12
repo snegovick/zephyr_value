@@ -1,0 +1,33 @@
+menuconfig VALUE_SYNC
+	bool "Value synchronization driver"
+	default y
+	depends on DT_HAS_VALUE_SYNC_ENABLED
+	help
+	  Enable value synchronization support.
+
+if VALUE_SYNC
+
+module = VALUE_SYNC
+module-str = sync
+source "subsys/logging/Kconfig.template.log_config"
+
+config VALUE_SYNC_INIT_PRIORITY
+	int "Driver initialization priority"
+	default 95
+	help
+	  System initialization priority for value synchronization drivers.
+
+config VALUE_SYNC_TIMING
+	bool "Enable timing"
+	depends on TIMING_FUNCTIONS
+	default n
+	help
+	  Enables time measurement which required for synchronization.
+
+config VALUE_SYNC_SHELL
+	bool "Enable shell support"
+	default n
+	help
+	  Enables shell commands for value sync.
+
+endif # VALUE_SYNC

@@ -1,0 +1,26 @@
+# Include this to add Value API support
+
+properties:
+  "#value-cells":
+    type: int
+    const: 1
+
+  "#up-value-cells":
+    type: int
+    const: 1
+
+  "#down-value-cells":
+    type: int
+    const: 1
+
+value-cells:
+  # value idendifier
+  - value_id
+
+up-value-cells:
+  # value idendifier
+  - value_id
+
+down-value-cells:
+  # value idendifier
+  - value_id

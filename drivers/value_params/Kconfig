@@ -1,0 +1,36 @@
+# Configuration file for value parameters driver
+
+menuconfig VALUE_PARAMS
+	bool "Value params driver"
+	default y
+	depends on DT_HAS_VALUE_PARAMS_ENABLED
+	help
+	  Enable value parameters support.
+
+if VALUE_PARAMS
+
+module = VALUE_PARAMS
+module-str = params
+source "subsys/logging/Kconfig.template.log_config"
+
+config VALUE_PARAMS_INIT_PRIORITY
+	int "Driver initialization priority"
+	default 95
+	help
+	  System initialization priority for value parameters drivers.
+
+config VALUE_PARAMS_SETTINGS
+	bool "Enable non-volatile parameters support"
+	default y
+	depends on SETTINGS
+	select SETTINGS_INIT
+	help
+	  Enables support for saving and loading parameter values to/from settings.
+
+config VALUE_PARAMS_SHELL
+	bool "Shell command support"
+	select FIXED_POINT
+	help
+	  Enables shell commands to get and set parameters.
+
+endif # VALUE_PARAMS

@@ -1,0 +1,43 @@
+# Configuration file for value filter driver
+
+menuconfig VALUE_FILTER
+	bool "Unified value filter driver"
+	default y
+	depends on DT_HAS_VALUE_FILTER_ENABLED
+	help
+	  Enable unified value filter support.
+
+if VALUE_FILTER
+
+module = VALUE_FILTER
+module-str = filter
+source "subsys/logging/Kconfig.template.log_config"
+
+config VALUE_FILTER_INIT_PRIORITY
+	int "Driver initialization priority"
+	default 95
+	help
+	  System initialization priority for value filter drivers.
+
+config VALUE_FILTER_MAX_VALUES
+	int "Maximum number of values"
+	default 32
+	help
+	  How many values can be configured per device.
+
+config VALUE_FILTER_SETTINGS
+	bool "Use settings to store parameters"
+	default y
+	depends on SETTINGS
+	select SETTINGS_INIT
+	help
+	  Enable storing filter parameters in settings
+
+config VALUE_FILTER_SHELL
+	bool "Value filter shell command"
+	depends on SHELL
+	select FIXED_POINT
+	help
+	  Enable value filter shell command for testing.
+
+endif # VALUE_FILTER

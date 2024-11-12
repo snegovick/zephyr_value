@@ -1,0 +1,8 @@
+comment "Extra drivers"
+rsource "drivers/*/Kconfig"
+
+#comment "Extra subsystems"
+#rsource "subsys/*/Kconfig"
+
+#comment "Extra libraries"
+#rsource "lib/*/Kconfig"

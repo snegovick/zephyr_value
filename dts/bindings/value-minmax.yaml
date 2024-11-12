@@ -1,0 +1,38 @@
+description: |
+  Value min/max driver bindings.
+
+  This driver scans values to determine global minimums and maximums
+  while it active.
+
+  Example:
+      #include <dt-bindings/value/minmax.h>
+
+      minmax: minmax {
+          compatible = "value-minmax";
+          #value-cells = <1>;
+          values = <&adc_vals CH1>, <&tsen T_CH1> /* ... */;
+      };
+
+      /* ... */
+      sync: sync {
+          compatible = "value-sync";
+          values = <&adc_vals VALS_SYNC>, <&tsen TSEN_SYNC>, <&minmax MINMAX_SYNC>;
+      };
+
+compatible: value-minmax
+
+include:
+  - base.yaml
+  - value-api.yaml
+
+properties:
+  values:
+    type: phandle-array
+    required: true
+    description: |
+      Input values phandles
+
+  initial-active:
+    type: boolean
+    description: |
+      Enable driver by default

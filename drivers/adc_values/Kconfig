@@ -1,0 +1,35 @@
+# Configuration file for ADC values driver
+
+menuconfig ADC_VALUES
+	bool "ADC values driver"
+	default y
+	depends on DT_HAS_ADC_VALUES_ENABLED
+	help
+	  Enable support ADC values polling.
+
+if ADC_VALUES
+
+module = ADC_VALUES
+module-str = adc_vals
+source "subsys/logging/Kconfig.template.log_config"
+
+config ADC_VALUES_INIT_PRIORITY
+	int "Driver initialization priority"
+	default 90
+	help
+	  System initialization priority drivers.
+
+config ADC_VALUES_MAX_CHANNELS
+        int "Maximum number of channels"
+        default 32
+        help
+          How many channels can be configured per device.
+
+config ADC_VALUES_SHELL
+	bool "ADC values shell commands"
+	depends on SHELL
+	default n
+	help
+	  Enables shell commands to debug ADC values poller.
+
+endif # ADC_VALUES

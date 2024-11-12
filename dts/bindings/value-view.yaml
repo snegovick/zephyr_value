@@ -1,0 +1,145 @@
+description: |
+  Unified value views.
+
+  The values will be displayed like the following:
+
+  <entry[0]><entry[1]>...<entry[columns]>
+  <entry[columns+1]>...
+
+  Each entry represented as follow:
+
+  [<name><name-sep>]<value><value-sep>
+
+  If no names is configured then name won't shown at all.
+
+  The source values assumed to be represented as numbers with a fixed-point.
+
+  The output representation is a decimal so the viewed values calculated like so:
+
+      <int_part>[.<fract_part>]
+
+      int_part = round(value * factor / scale);
+
+      if presision > 0:
+          fract_part = round(abs(value) * factor % scale * 10 ^ fract_digits / scale)
+
+  Config example:
+
+      views {
+          vas {
+              compatible = "value-view";
+              name = "vas";
+              help = "Show measured voltages and currents";
+              names = "Vin", "Vout", "Iout";
+              values = <&v_sensor 1>, <&v_sensor 0>, <&i_sensor2 0>;
+              scales = <(1 << 24)>, <(1 << 24)>, <(1 << 16)>;
+              fract-digits = <3>, <3>, <1>;
+              units = "V", "V", "A";
+          };
+          /* ...other views */
+      };
+
+compatible: value-view
+
+include:
+  - base.yaml
+
+properties:
+  name:
+    type: string
+    required: true
+    description: |
+      Short name of view which will be used as a sub-command.
+
+  help:
+    type: string
+    required: false
+    description: |
+      Short description for view command.
+
+  values:
+    type: phandle-array
+    required: true
+    description: |
+      Values phandles
+
+  value-sep:
+    type: string
+    required: false
+    default: "\t"
+    description: |
+      The separator which will be used between values.
+
+      The single tab character is used by default.
+
+  names:
+    type: string-array
+    required: false
+    description: |
+      The names to display before each values.
+
+      <name><name-sep><value><value-sep>...
+
+  name-sep:
+    type: string
+    required: false
+    default: " "
+    description: |
+      The separator which will be used between the name
+      and corresponding value when names is configured.
+
+      The single space character is used by default.
+
+  units:
+    type: string-array
+    required: false
+    description: |
+      The units for values.
+
+  unit-sep:
+    type: string
+    required: false
+    default: " "
+    description: |
+      The separator which will be used between the values
+      and corresponding units when units is configured.
+
+  columns:
+    type: int
+    required: false
+    description: |
+      The maximum number of values per line.
+
+  align-columns:
+    type: boolean
+    description: |
+      Align columns to get pretty view.
+
+  factors:
+    type: array
+    description: |
+      The factors (multipliers) for values.
+
+      By default factor is equals to 1.
+
+  scales:
+    type: array
+    description: |
+      The scales (dividers) for values.
+
+      By default scale is equals to 1.
+
+  int-digits:
+    type: array
+    description: |
+      The minimum number of decimal digits for integer part of value.
+
+      This property can be used for alignment.
+
+  fract-digits:
+    type: array
+    description: |
+      The number of decimal digits after point for values.
+
+      If this property is not provided then only integer part of value
+      will be displayed.
