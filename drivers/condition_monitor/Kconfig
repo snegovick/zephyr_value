@@ -1,0 +1,22 @@
+# Configuration file for condition monitor driver
+
+menuconfig CONDITION_MONITOR
+	bool "Condition monitor driver"
+	default y
+	depends on DT_HAS_CONDITION_MONITOR_ENABLED
+	help
+	  Enable condition monitoring support.
+
+if CONDITION_MONITOR
+
+module = CONDITION_MONITOR
+module-str = cond_mon
+source "subsys/logging/Kconfig.template.log_config"
+
+config CONDITION_MONITOR_INIT_PRIORITY
+	int "Driver initialization priority"
+	default 90
+	help
+	  System initialization priority drivers.
+
+endif # CONDITION_MONITOR

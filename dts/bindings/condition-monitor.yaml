@@ -1,0 +1,61 @@
+description: |
+  Unified value condition monitor.
+
+  #include <dt-bindings/value/monitor.h>
+
+  / {
+    pwr: pwr_graph {
+      values = <&mon0 MONITOR_STATE> /*, ... */;
+    };
+
+    mon0: cond_mon {
+      compatible = "condition-monitor";
+      initial-active; /* enable on startup */
+      values = <&cpu_t 1>, <&cpu_t 2>; /* monitor two values */
+      scale = <(1 << 12)>; /* 12-bit fraction (Q12) */
+      minimum = <10>; /* 10C */
+      maximum = <75>; /* 75C */
+    };
+  };
+
+compatible: condition-monitor
+
+include:
+  - base.yaml
+  - value-api.yaml
+
+properties:
+  values:
+    type: phandle-array
+    required: true
+    description: |
+      The values for monitoring.
+
+  minimum:
+    type: array
+    description: |
+      Minimum safe value (<numerator denominator>).
+
+      Examples:
+        <15> or <15 1> means 15.0
+        <15 100> means 0.15
+
+  maximum:
+    type: array
+    description: |
+      Maximum safe value (<numerator denominator>).
+
+      Examples:
+        <15> or <15 1> means 15.0
+        <15 100> means 0.15
+
+  scale:
+    type: int
+    default: 1
+    description: |
+      Monitoring values scale (<demonimator>).
+
+  initial-active:
+    type: boolean
+    description: |
+      Enable monitoring on initialization.
