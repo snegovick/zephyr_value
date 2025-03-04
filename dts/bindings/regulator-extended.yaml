@@ -1,0 +1,62 @@
+description: GPIO-controlled extended regulators
+
+# include: regulator.yaml
+
+# NOTE: The driver supports "regulator-extended-sync" as a specializing
+# variant when it's known that the GPIO state change operations are
+# isr-ok and not sleep, and both startup and off-on delays are zero.
+# This bypasses the asynchronous onoff manager which optimizes both time
+# and memory use.
+#
+# To enable this use both:
+#    compatible = "regulator-extended-sync", "regulator-extended";
+#
+
+compatible: regulator-extended
+
+include:
+  - base.yaml
+  - value-api.yaml
+
+properties:
+  enable-gpios:
+    type: phandle-array
+    required: true
+    description: |
+      GPIO to use to enable/disable the regulator.
+
+      Unlike the gpio property in the Linux bindings this array must
+      provide the GPIO polarity and open-drain status in the phandle
+      selector.  The Linux enable-active-high and gpio-open-drain
+      properties are not valid for Zephyr devicetree files.
+
+  pgood-gpios:
+    type: phandle-array
+    required: false
+    description: |
+      GPIO to check power good signal on.
+
+      Unlike the gpio property in the Linux bindings this array must
+      provide the GPIO polarity and open-drain status in the phandle
+      selector.  The Linux enable-active-high and gpio-open-drain
+      properties are not valid for Zephyr devicetree files.
+
+  startup-delay-us:
+    type: int
+    required: false
+    default: 0
+    description: Startup time, in microseconds
+
+  off-on-delay-us:
+    type: int
+    required: false
+    default: 0
+    description: Off delay time, in microseconds
+
+  regulator-always-on:
+    type: boolean
+    description: Regulator should always be on
+
+  regulator-boot-on:
+    type: boolean
+    description: Regulator should be turned on at startup

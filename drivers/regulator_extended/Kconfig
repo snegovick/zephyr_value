@@ -1,0 +1,46 @@
+menuconfig REGULATOR_EXTENDED
+	bool "Extended GPIO-controlled regulators"
+	default y
+	depends on DT_HAS_REGULATOR_EXTENDED_ENABLED
+	depends on GPIO
+	help
+	  Enable the driver for GPIO-controlled regulators
+
+if REGULATOR_EXTENDED
+
+module = REGULATOR_EXTENDED
+module-str = regulator-extended
+source "subsys/logging/Kconfig.template.log_config"
+
+config REGULATOR_EXTENDED_INIT_PRIORITY
+	int "Init priority"
+	default 75
+	help
+	  Device driver initialization priority
+
+config REGULATOR_EXTENDED_MONITOR_PGOODS
+	bool "Monitor power good signals"
+	default y
+	help
+	  Enable continuous monitoring for pgood signals when regulator is
+	  enabled and/or disabled.
+
+	  When regulator enabled this allows handle power failure cases
+	  like a short circuits to prevent hardware damages.
+
+	  When regulator disabled this potentially allows handle power
+	  conflict cases when multiple sources may be enabled simultaneously.
+
+config REGULATOR_EXTENDED_SIMULATE_FAULTS
+	bool "Support for simulated faults"
+	default n
+	help
+	  Enables fault simulation by setting pgood for testing purposes.
+
+config REGULATOR_EXTENDED_SHELL
+	bool "Shell commands"
+	depends on SHELL
+	help
+	  Enable extra shell commands for testing.
+
+endif # REGULATOR_EXTENDED
