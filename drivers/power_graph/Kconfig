@@ -1,0 +1,53 @@
+menuconfig POWER_GRAPH
+	bool "Power graph"
+	default y
+	depends on DT_HAS_POWER_GRAPH_ENABLED
+	depends on REGULATOR_EXTENDED
+	help
+	  Enable the driver for power graphs
+
+if POWER_GRAPH
+
+module = POWER_GRAPH
+module-str = power-graph
+source "subsys/logging/Kconfig.template.log_config"
+
+config POWER_GRAPH_NUM_DEVICES
+	int "Maximum number of controlled devices"
+	default 64
+	help
+	  Set the maximum number of devices to switch.
+
+config POWER_GRAPH_NUM_STAGES
+	int "Maximum number of stages to switch"
+	default 64
+	help
+	  Set the maximum number of stages to switch.
+
+config POWER_GRAPH_NUM_STATES
+	int "Maximum number of states to switch"
+	default 4
+	help
+	  Set the maximum number of states to switch.
+
+config POWER_GRAPH_FAULT_LOG
+	int "Fault log depth"
+	default 3
+	help
+	  The number of last logged faults.
+
+	  Set to 0 to disable fault log.
+
+config POWER_GRAPH_INIT_PRIORITY
+	int "Init priority"
+	default 75
+	help
+	  Device driver initialization priority
+
+config POWER_GRAPH_SHELL
+	bool "Shell commands"
+	depends on SHELL
+	help
+	  Enable extra shell commands for testing.
+
+endif # POWER_GRAPH

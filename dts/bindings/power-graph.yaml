@@ -1,0 +1,86 @@
+description: Power graph for gpios and extended regulators
+
+compatible: power-graph
+
+include:
+  - base.yaml
+  - value-api.yaml
+
+properties:
+  safe-state:
+    type: int
+    required: true
+    description: |
+      The state which will be used as a safe state.
+
+      This is a safe state to switch in case of errors.
+
+  values:
+    type: phandle-array
+    required: true
+    description: |
+      Drivers and value ids to use with power graph.
+
+  value-names:
+    type: string-array
+    required: true
+    description: |
+      Names for the provided values. The number of names
+      needs to match the number of values.
+
+child-binding:
+  description: |
+    Power graph states and transitions.
+
+  properties:
+    id:
+      type: int
+      required: false
+      description: |
+        The numeric identifier of state.
+
+        Usually 0 is an implicit power off state,
+        2 is an explicit standby state and so on.
+
+    label:
+      type: string
+      required: false
+      description: |
+        The textual name of state or transition.
+
+    initial:
+      type: int
+      required: false
+      description: |
+        The identifier of initial state of transition.
+
+    target:
+      type: int
+      required: false
+      description: |
+        The identifier of target state of transition.
+
+    stages:
+      type: string-array
+      required: false
+      description: |
+        Value binding names to switch for transition.
+
+        Values in this array are sequentially turned on or off
+        depending from values in corresponding `states` property.
+
+        Each index should correspond to value binding in parent node
+        (see `values` property).
+
+    states:
+      type: array
+      required: false
+      description: |
+        Value states to apply under transition.
+
+        Set <1> to turn device on.
+        Set <0> to turn device off.
+
+    ignore-faults:
+      type: boolean
+      description: Go to the next stage when previous failed.
