@@ -65,7 +65,8 @@ struct driver_data {
 	bool enabled;
 #if IS_ENABLED(CONFIG_REGULATOR_EXTENDED_MONITOR_PGOODS)
 	/* marker to find start of callbacks */
-	gpio_port_pins_t marker;
+	//gpio_port_pins_t marker;
+	struct gpio_callback marker;
 	/* pgood callbacks */
 	struct gpio_callback pgood_cb[];
 #endif /* IS_ENABLED(CONFIG_REGULATOR_EXTENDED_MONITOR_PGOODS) */
@@ -75,7 +76,7 @@ struct driver_data {
 
 /* check marker field alignment (for case when structure layout has changed) */
 BUILD_ASSERT(offsetof(struct driver_data, marker) ==
-	     offsetof(struct driver_data, pgood_cb[-1].pin_mask),
+	     offsetof(struct driver_data, pgood_cb[-1]),
 	     "Invalid marker field alignment");
 
 #endif /* IS_ENABLED(CONFIG_REGULATOR_EXTENDED_MONITOR_PGOODS) */
@@ -150,7 +151,7 @@ const struct device *device_from_pgood_cb(struct gpio_callback *cb)
 	/* find start of pgood callbacks */
 	for (; cb->pin_mask != 0; cb--);
 
-	return CONTAINER_OF(cb + 1, struct driver_data, pgood_cb)->dev;
+	return CONTAINER_OF(cb, struct driver_data, marker)->dev;
 }
 
 static void handle_pgoods(const struct device *port, struct gpio_callback *cb,
@@ -217,7 +218,7 @@ static int init_pgoods(const struct device *dev)
 			gpio = &cfg->pgood_gpio[i];
 
 #if IS_ENABLED(CONFIG_REGULATOR_EXTENDED_MONITOR_PGOODS)
-			/* check is any interrupt enabled */
+			/* check if any interrupt is enabled */
 			if (gpio->dt_flags & (GPIO_EDGE_TO_INACTIVE | GPIO_EDGE_TO_ACTIVE)) {
 				gpio_init_callback(&data->pgood_cb[i], handle_pgoods, 1 << gpio->pin);
 
@@ -229,7 +230,7 @@ static int init_pgoods(const struct device *dev)
 								   GPIO_INT_EDGE_RISING : 0));
 
 				if (rc != 0) {
-					LOG_DBG("%s: error when configure pgood gpio interrupt #%u: %i",
+					LOG_DBG("%s: error while configuring pgood gpio interrupt #%u: %i",
 						dev->name, i, rc);
 					return rc;
 				}
@@ -312,7 +313,8 @@ static void finalize_transition(struct driver_data *data, uint32_t delay_us)
  */
 static void regulator_extended_work(struct k_work *work)
 {
-	struct driver_data *data = CONTAINER_OF(work, struct driver_data, work);
+	struct k_work_delayable *kwd = k_work_delayable_from_work(work);
+	struct driver_data *data = CONTAINER_OF(kwd, struct driver_data, work);
 	const struct device *dev = data->dev;
 	const struct driver_config *cfg = dev->config;
 	uint32_t delay_us = 0;
@@ -514,7 +516,7 @@ end:
 
 #if IS_ENABLED(CONFIG_REGULATOR_EXTENDED_MONITOR_PGOODS)
 #define MONITOR_PGOODS_EXTRA_DATA(id)					      \
-	.marker = 0,							      \
+	.marker = {.pin_mask = 0},					      \
 	IF_ENABLED(DT_INST_NODE_HAS_PROP(id, pgood_gpios),		      \
 		   (.pgood_cb = { DT_INST_FOREACH_PROP_ELEM(id, pgood_gpios,  \
 							    REG_GPIO_CB_INIT) \

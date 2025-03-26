@@ -147,13 +147,13 @@ struct driver_data {
 	uint8_t last_fault;             /* latest logged fault */
 #endif
 	const struct device *dev;       /* the pointer to device for callbacks */
-	value_sub_fn marker;            /* always zero to mark the head of callbacks */
+	struct value_sub_cb marker;            /* always zero to mark the head of callbacks */
 	struct value_sub_cb cbs[];      /* num of subscriptions is same as num of devices */
 };
 
 /* check marker field alignment (for case when structure layout has changed) */
 BUILD_ASSERT(offsetof(struct driver_data, marker) ==
-	     offsetof(struct driver_data, cbs[-1].func),
+	     offsetof(struct driver_data, cbs[-1]),
 	     "Invalid marker field alignment");
 
 #if CONFIG_POWER_GRAPH_FAULT_LOG > 0
@@ -437,7 +437,7 @@ static const struct device *device_from_cb(struct value_sub_cb *cb)
 	/* go up to zero field */
 	for (; cb->func != NULL; cb--);
 
-	return CONTAINER_OF(cb + 1, struct driver_data, cbs)->dev;
+	return CONTAINER_OF(cb, struct driver_data, marker)->dev;
 }
 
 static dev_idx_t find_spec(const struct device *dev,
@@ -719,7 +719,7 @@ static const struct value_driver_api power_graph_api = {
 		.new_state = DT_INST_PROP(inst, safe_state),		 \
 		.transition = NO_STATE,					 \
 		.stage = NO_STAGE,					 \
-		.marker = NULL,						 \
+		.marker = {.func = NULL},				 \
 		.cbs = { DT_INST_FOREACH_PROP_ELEM(inst, values,	 \
 						   SUB_CB_DATA) },	 \
 	};								 \
