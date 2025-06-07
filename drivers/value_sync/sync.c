@@ -118,6 +118,7 @@ static const struct value_driver_api sync_api = {
 
 static void sync_work(struct k_work *work)
 {
+	struct k_work_delayable *kwd = k_work_delayable_from_work(work);
 	struct sync_data *data = CONTAINER_OF(work, struct sync_data, work);
 	const struct device *dev = data->dev;
 	const struct sync_config *cfg = dev->config;
