@@ -527,10 +527,12 @@ end:
 
 #define REGULATOR_EXTENDED_DEVICE(id)					       \
 									       \
-	static const struct gpio_dt_spec enable_gpios_##id[] = {	       \
+	IF_ENABLED(DT_INST_NODE_HAS_PROP(id, pgood_gpios),		       \
+		   (static const struct gpio_dt_spec		       \
+		    enable_gpios_##id[] = {				       \
 		DT_INST_FOREACH_PROP_ELEM(id, enable_gpios,		       \
 					  REG_GPIO_DT_SPEC_ELEM)	       \
-	};								       \
+	}));								       \
 									       \
 	IF_ENABLED(DT_INST_NODE_HAS_PROP(id, pgood_gpios),		       \
 		   (static const struct pgood_gpio_dt_spec		       \
@@ -540,8 +542,11 @@ end:
 	}));								       \
 									       \
 	static const struct driver_config regulator_extended_config_##id = {   \
-		.enable_gpio = enable_gpios_##id,			       \
-		.num_enables = ARRAY_SIZE(enable_gpios_##id),		       \
+		COND_CODE_1(DT_INST_NODE_HAS_PROP(id, enable_gpios),                \
+			    (.enable_gpio = enable_gpios_##id,		       \
+			     .num_enables = ARRAY_SIZE(enable_gpios_##id)),      \
+			    (.enable_gpio = NULL,			       \
+			     .num_enables = 0)),				       \
 		COND_CODE_1(DT_INST_NODE_HAS_PROP(id, pgood_gpios),	       \
 			    (.pgood_gpio = pgood_gpios_##id,		       \
 			     .num_pgoods = ARRAY_SIZE(pgood_gpios_##id)),      \

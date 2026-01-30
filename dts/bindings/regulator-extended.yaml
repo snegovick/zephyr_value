@@ -21,7 +21,7 @@ include:
 properties:
   enable-gpios:
     type: phandle-array
-    required: true
+    required: false
     description: |
       GPIO to use to enable/disable the regulator.
 
