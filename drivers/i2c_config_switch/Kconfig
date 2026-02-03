@@ -1,0 +1,21 @@
+menuconfig I2C_CONFIG_SWITCH
+	bool "I2C config switch"
+	default y
+	depends on DT_HAS_I2C_CONFIG_SWITCH_ENABLED
+	help
+	  This driver is designed to switch I2C bus target mode on and off
+	  within power sequencer pipeline via value API.
+
+if I2C_CONFIG_SWITCH
+
+module = I2C_CONFIG_SWITCH
+module-str = I2C config switch
+source "subsys/logging/Kconfig.template.log_config"
+
+config I2C_CONFIG_SWITCH_INIT_PRIORITY
+	int "Driver initialization priority"
+	default 90
+	help
+	  System initialization priority for I2C config switch drivers.
+
+endif # I2C_CONFIG_SWITCH

@@ -1,0 +1,18 @@
+description: |
+  This driver is designed to switch I2C bus target mode on and off
+  within power sequencer pipeline via value API.
+  I2C bus is switched into target mode (all targets are registered)
+  when I2C_CONFIG_SWITCH_ENABLE_TARGET variable is set to non-zero value.
+  Otherwise all targets are unregistered, which enables controller mode.
+  Target registering/unregistering occur synchronously on value_set call.
+
+compatible: i2c-config-switch
+
+include:
+  - value-api.yaml
+
+properties:
+  i2c-bus:
+    type: phandle
+    required: true
+    description: I2C bus which needs to be switched.
