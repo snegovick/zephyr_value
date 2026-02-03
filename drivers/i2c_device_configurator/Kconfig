@@ -1,0 +1,22 @@
+menuconfig I2C_DEVICE_CONFIGURATOR
+	bool "I2C device configurator driver"
+	default y
+	depends on DT_HAS_I2C_DEVICE_CONFIGURATOR_ENABLED
+	depends on I2C
+	help
+	  I2C device configurator writes data specified in write-data DTS property to I2C device
+	  on positive transition of REGEXT_STATE value API id, e.g. in power sequencer pipeline.
+
+if I2C_DEVICE_CONFIGURATOR
+
+module = I2C_DEVICE_CONFIGURATOR
+module-str = i2c-device-configurator
+source "subsys/logging/Kconfig.template.log_config"
+
+config I2C_DEVICE_CONFIGURATOR_INIT_PRIORITY
+	int "Driver initialization priority"
+	default 90
+	help
+	  System initialization priority for I2C device configurator drivers.
+
+endif #I2C_DEVICE_CONFIGURATOR

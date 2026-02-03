@@ -1,0 +1,59 @@
+description: |
+  Generic device configurator. Its purpose is to push write-data
+  to specified I2C device when triggered via value API on positive transition or at init time.
+
+compatible: i2c-device-configurator
+
+include:
+  - i2c-device.yaml
+  - value-api.yaml
+
+properties:
+  initial-state:
+    type: int
+    description: |
+      The state during initialization.
+
+      Operations which associated with that state will be executed during initialization.
+    default: 0
+
+child-binding:
+  description: State with operations.
+
+  properties:
+    state:
+      type: int
+      description: State identifier.
+      required: true
+
+  child-binding:
+    description: Operations.
+
+    properties:
+      cmd:
+        type: array
+        description: |
+          Optional command code bytes to push before data.
+
+          Actual data will be pushed immediatelly without restart.
+
+      cmd-raw:
+        type: uint8-array
+        description: |
+          Optional command code hex bytes to push before data.
+
+          Actual data will be pushed immediatelly without restart.
+
+      block:
+        type: boolean
+        description: Add length byte before data.
+
+      data:
+        type: array
+        description: |
+          This array of bytes will be pushed into device upon activation.
+
+      data-raw:
+        type: uint8-array
+        description: |
+          This array of hex bytes will be pushed into device upon activation.
